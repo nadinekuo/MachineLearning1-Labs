@@ -1,4 +1,4 @@
-# CS4240 Machine Learning 1 Lab Exercises
+# CS4220 Machine Learning 1 Lab Exercises
 
 ### *Delft University of Technology 23/24*
 
