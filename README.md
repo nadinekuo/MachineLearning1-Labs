@@ -21,8 +21,7 @@
 - **Polynomial Regression** fits a polynomial of some *maximal* degree to the data in a least squares sense
     - *Note: even though this results in a non-linear function in x, the regression function is linear in the unknown parameters w estimated from the data.*
     - If there are 4 data points, one needs at least a third-order polynomial to fit these (whether there is a bias term does not matter)
-    - Example of second-degree polynomial: `y = x1 * x2` (this is not: `sin(x1)sin(x2)`)
-    - Note that `linearr` does not take into cross-terms, leading to high error rates...
+    - Note that linear regressors (`linearr`) do not take into cross-terms, leading to high error rates when trained on (non-linear data) that contain multiplications of `x_i` terms: e.g. data modelled as `y = sin(x1)sin(x2)`
 - **Decision boundary** of **linear classifier** is found at `f(x) = y = 0`
     - `y = ax + b` with intercept `b = -w0 / w2` and slope `a = -(w0/w2)/(w0/w1)` 
 
