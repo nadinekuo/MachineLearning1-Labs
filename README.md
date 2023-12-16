@@ -15,6 +15,7 @@
 
 ## 2. Linear Regression & Linear Classifiers
 
+- Differently from labelled datasets (often numeric labels `y`) in supervised classification tasks, **regression datasets** contain inputs `x` (uniformly distributed e.g.) with a corresponding `y` depdendent on `x` (`y = x^2 + eps` where `eps` can be some Gaussian noise e.g.)
 - We can fit linear functions under the **squared loss** using `w = (X^TX)^-1 * X^T * Y`
     - Typically we have an intercept as well giving `w^T = [w0 w1]` which can be plugged into `f(x) = w1 * x + w0` 
     - Note we need to add a bias term to X
