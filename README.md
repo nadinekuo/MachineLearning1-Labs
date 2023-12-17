@@ -29,6 +29,26 @@
 
 ## 3. Losses, Regularization, Evaluation
 
+- Regularization aims to stabilize objective functions to prevent overfitting - possibly caused by curse of dimensionality or lack of data (multicollinearity)
+    - **Ridge regularization (L2)** keeps weights small
+    - **Lasso regularization (L1)** introduces sparsity and can get rid of redundant features
+    - Whereas $w_i$ entries can become 0 for large $\lambda$ (i.e. small $\tau$) in L1 regularization, this is impossible for L2
+- The optimal regularization parameter $\lambda$ can be found using **cross-validation** (hyperparameter tuning)
+    - **K-fold Cross Validation**: N chunks used for training independent classifiers (take avg of `N` error estimates), 1 chunk used for evaluating (compared against *true error* on full training set)
+    - **Leave-one-out-Procedure**: Single test object
+- **Learning curves** show classification errors against the training set size
+    - The discrepancy between *true error* and *apparent error* is **overfitting**
+- **Feature curves** show how the classification error varies with varying numbers of feature dimensionality
+    - **Curse of dimensionality** = error goes up after a certain dimensionality threshold 
+- *Variabililty in error* is larger for small training sets
+    - The more complex the model, the more training samples needed! 
+    - *Large, independent test sets* yield an unbiased and small variance error estimate (but worse classifier due to less data used for training..)
+    - *Small, independent test sets* yield an unbiased and large variance error estimate
+
+
+
+
+
 
 ## 4. Probabilistic Models & Clustering
 
