@@ -47,7 +47,29 @@
 
 
 
-## 4. Probabilistic Models & Clustering
+## 4a. Probabilistic Models 
+
+- **Maximum Likelihood** finds the parameters $w$ that maximize $P(x, y | w)$, i.e. probability of observed data
+- **Maximum A Posteriori** finds $w$ that maximize $P(w | x, y) = P(x, y | w) * P(w)$, i.e. it assumes some prior knowledge about the weights in $P(w)$
+    - Prior increases bias, but reduces variance
+    - $w_{MAP}$ may coincide with the solutions for Ridge (R2) and Lasso (L1) regularization, depending on assumptions made on the prior
+
+- **Bayesian networks** allow us to reason about dependencies between random variables and thus construct $P$ from simpler components 
+    - Given $N$ RVs, there are $N!$ possible decompositions
+    - Even if not all assumptions are valid, model complexity is still lowered due to fewer parameters to estimate 
+
+
+
+
+
+
+
+
+## 4b. Clustering
+
+
+
+
 
 
 
