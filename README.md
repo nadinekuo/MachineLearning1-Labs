@@ -50,8 +50,10 @@
 ## 4a. Probabilistic Models 
 
 - **Maximum Likelihood** finds the parameters $w$ that maximize $P(x, y | w)$, i.e. probability of observed data
-- **Maximum A Posteriori** finds $w$ that maximize $P(w | x, y) = P(x, y | w) * P(w)$, i.e. it assumes some prior knowledge about the weights in $P(w)$
+- **Maximum A Posteriori** finds $w$ that maximize $P(w | x, y) = P(x, y | w) * P(w)$, i.e. it assumes some prior knowledge about the weights in $P(w)$ - e.g. uniform in $[a,b]$ or Gaussian distribution $N(w | \mu, \sigma^2)$
     - Prior increases bias, but reduces variance
+    - The *Haldane prior* is an improper prior that does not satisfy all properties of a pdf
+        - Leads to uniform posterior $P(w | x, y)$, so no unique MAP solution
     - $w_{MAP}$ may coincide with the solutions for Ridge (R2) and Lasso (L1) regularization, depending on assumptions made on the prior
 
 - **Bayesian networks** allow us to reason about dependencies between random variables and thus construct $P$ from simpler components 
