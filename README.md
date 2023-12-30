@@ -61,15 +61,18 @@
     - Even if not all assumptions are valid, model complexity is still lowered due to fewer parameters to estimate 
 
 
-
-
-
-
-
-
 ## 4b. Clustering
 
-
+- Clustering aims to find patterns in unstructured data
+- **Agglomerative Hierarchical Clustering**
+    - Input: dataset `X`, distance matrix `D` and linkage type (single, average complete)
+    - Output: dendogram
+    - Algorithm stops when there is 1 cluster left, after which we cut the dendogram to obtain the desired no. of clusters (long vertical bars imply large distances)
+- **Mixture of Gaussians**
+    -  We assume K separate distributions, one for each cluster
+    - The  **EM-algorithm** is used to approximate model parameters
+        - E-step: Update membership $P(C_k|x; \theta)$ based on updated classifier
+        - M-step: Improve model by updating maximum likelihood estimates ($L(\theta | x) = \prod^N_{i=1}p(x_i|\theta)$) of parameters based on cluster membership
 
 
 
