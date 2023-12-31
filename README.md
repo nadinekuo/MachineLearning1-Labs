@@ -73,7 +73,11 @@
     - The  **EM-algorithm** is used to approximate model parameters
         - E-step: Update membership $P(C_k|x; \theta)$ based on updated classifier
         - M-step: Improve model by updating maximum likelihood estimates ($L(\theta | x) = \prod^N_{i=1}p(x_i|\theta)$) of parameters based on cluster membership
-
+- **Cluster validation** is used for assessing clusterings and no. of clusters
+    - **Fusion level maps** plot the linkage distances (y-axis) against the number of clusters (x-axis)
+        - Heuristic: cut the dendogram at largest jump
+    - **Davies-Bouldin Index (DBI)** is a cluster score that incorporates both **within-** and **between scatters**
+        - Heuristic: pick the no. of clusters that minimizes the DBI (minimum in plot)
 
 
 
