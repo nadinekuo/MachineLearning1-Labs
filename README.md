@@ -68,6 +68,7 @@
     - Input: dataset `X`, distance matrix `D` and linkage type (single, average complete)
     - Output: dendogram
     - Algorithm stops when there is 1 cluster left, after which we cut the dendogram to obtain the desired no. of clusters (long vertical bars imply large distances)
+    - *Single linkage is sensitive to outliers!*
 - **Mixture of Gaussians**
     -  We assume K separate distributions, one for each cluster
     - The  **EM-algorithm** is used to approximate model parameters
@@ -79,6 +80,61 @@
     - **Davies-Bouldin Index (DBI)** is a cluster score that incorporates both **within-** and **between scatters**
         - Heuristic: pick the no. of clusters that minimizes the DBI (minimum in plot)
 
+### Partitional Techniques
+
+#### K-means
+
+| Pros | Cons |
+| -------- | -------- |
+| Simple, fast     | <span style="color:red"> Assumes spherical/convex clusters </span> | 
+| | <span style="color:red"> Sensitive to initialization <span> | 
+|  | Can get stuck in local minima (*start from many random initializations*) |
+| | Clusters can lose all samples (*remove cluster or split largest into 2*) | 
+
+
+#### Mixture of Gaussians (soft / probabilistic)
+
+| Pros | Cons |
+| -------- | -------- |
+| Can use prior knowledge on cluster distribution | <span style="color:red"> Assumes a priori known no. of clusters </span> |
+| Gives general framework for any density mixture | Need to define a cluster density (e.g. Gaussian) |
+| Allows for overlapping clusters | Guarantees finding of *local* optimum only |
+| | May converge slowly |
+| | <span style="color:red"> Is dependent on initialization <span> | 
+
+
+
+#### Mean Shift
+
+| Pros | Cons |
+| -------- | -------- |
+| Does not assume spherical/convex clusters | Computationally expensive |
+| Just a single parameter (window size) | Output depends on window size |
+| Finds variable no. of modes | Does not scale well with dimension of feature space |
+| Robust to outliers | |
+| Finds global optimum | |
+
+
+
+### Hierarchical Techniques
+
+| Pros | Cons |
+| -------- | -------- |
+| Dendogram gives intuitive overview of possible clusters | Single linkage is sensitive to outliers |
+| Linkage type allows for clusters of varying shapes (convex and non-convex) | Computationally expensive! $O(n^2)$ in time and space |
+| Different dissimilarity measures can be used | Clusterings limited to "hierarchical nestings" |
+
+
+
+### Graph Techniques
+
+#### Spectral Clustering
+
+| Pros | Cons |
+| -------- | -------- |
+| Can operate on arbitrary graphs | <span style="color:red"> Assumes a priori known no. of clusters </span>  |
+| Clusters can have any shape | Requires a K-means clustering anyways |
+| All no. of clusters are possible | Computationally relatively expensive ($O(N^3)$ for non-sparse matrices) |
 
 
 
