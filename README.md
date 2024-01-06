@@ -111,7 +111,7 @@
 | Does not assume spherical/convex clusters | Computationally expensive |
 | Just a single parameter (window size) | Output depends on window size |
 | Finds variable no. of modes | Does not scale well with dimension of feature space |
-| Robust to outliers | |
+| Robust to outliers | |2+++++++++++++++++++++++++++++++++++++++++++++++++ 
 | Finds global optimum | |
 
 
@@ -157,8 +157,34 @@
 
 
 
+## 6a. Feature Reduction
+
+### Feature Extraction
+
+**Principle Component Analysis** - Unsupervised
+
+- Does not directly reduce dimensions, but projects data to new space i.e. moves x-axis into principle axis of largest variation (`PC 1`) by translation and rotation
+
+- Global and linear
+
+- Can only be applied to data that is linearly separable
+    - If that is not the case, a kernel function $\Phi$ can be used to map original data to higher dimension in which it's linearly separable 
+
+
+**Linear Discriminant Analysis (Fisher Mapping)** - Supervised
+
+- Similarity with PCA: projects data onto new axes to reduce dimensionality
+- Difference: maximizes *separability of classes* rather than *global variance*
+
+
+
+### Feature Selection
 
 
 
 
-## 6. Reducing & Combining
+
+
+## 6b. Combining Classifiers
+
+
