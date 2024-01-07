@@ -180,8 +180,32 @@
 
 ### Feature Selection
 
+Greedy approximations (alternative to exhaustive search algorithms):
+
+- **Simplest Variation**: select best individual $d$
+
+- **Forward Selection**: start with empty feature set. One at a time, keep adding feature that gives best performance when added to current selection.
+
+- **Backward Selection**: start with all features. One at a time, remove feature that leads to best performance considering the feature selection remaining.
+
+- **Plus-l-take-away-r**: start with empty set (if $l > r$) or entire set (if $l < r$). Keep adding best $l$ and removing worst $r$ or vice versa.
+
+Criteria to use in approximations above:
+
+- **Heuristic Scatter Based**
+
+$J_1 = trace(S_w + S_B) = trace(\sum)$
+
+$J_2 = ...$ 
+
+- **Mahalanobis Distance**: distance measure between point and *distribution* - unlike Euclidean, accounts for variability in features!
+
+$D_M = (\mu_1 - \mu_2)^TC^-1(\mu_1 - \mu_2)$
 
 
+- **Fisher Criterion**: seeks to minimize within-scatter and maximize between-scatter
+
+$J_F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$
 
 
 
