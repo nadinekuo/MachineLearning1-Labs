@@ -211,4 +211,41 @@ $J_F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$
 
 ## 6b. Combining Classifiers
 
+### Fixed Combining Rules
 
+- Special trained rules based on "classifier confidences"
+- General trained rules interpreting base-classifier outputs as features
+
+Base classifier: $y = S(x | \theta_{base})$
+
+Combining classifier: $z = C(y | \theta_{comb})$
+
+Different combining rules possible: 
+- Product, minimum
+- Sum (mean), median, majority vote
+- Maximum
+
+<span style="color:red"> Supoptimal: neglect the classification confidence characteristic of the base classifier outputs, as they are treated as general feature values... </span>
+
+
+
+### Trained Combining Rules
+
+Output: posterior probability distribution over all $C$ classes, rather than a single class decided by a fixed combining rule.
+
+Special trained combiners:
+- DT: Decision Templates ~ Nearest Mean
+- BKS: Behavioral Knowledge Space
+- DCS: Dynamic Classifier Selection
+- ECOC: Error Correcting Output Coding
+- NN: Neural Networks
+
+
+#### Generation of Base Classifiers
+
+- **Random Subspace** Approach
+- **Bagging** ~ bootstrapping & aggregate
+- **Boosting ~ AdaBoost**
+    - Assumes decision stump as weak base classifier
+    - Minimizes exponential error
+    - <span style="color:red"> Suffers from overtraining when combining ~ >= 1000 classifiers... </span> - large discrepancy between true error and apparent error (never converge)
