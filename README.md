@@ -10,7 +10,7 @@
     - In the limit, the solutions by LDA and QDA will coincide
 - Hyperparameters (such as $h$ in Parzen estimator) should be tuned on test sets independent from training data
     - Optimal value can be found by plotting values (x-axis) against the log-likelihood (y-axis) using elbow method
-- k-NN and NMC are sensitive to **scaling** of features, because these methods do not estimate covariance matrices
+- Parzen, k-NN and NMC are sensitive to **scaling** of features, because these methods do not estimate covariance matrices
 
 
 ## 2. Linear Regression & Linear Classifiers
