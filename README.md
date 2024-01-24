@@ -54,6 +54,23 @@ This is because the classifier becomes very complex.
 - The optimal regularization parameter $\lambda$ can be found using **cross-validation** (hyperparameter tuning)
     - **K-fold Cross Validation**: N chunks used for training independent classifiers (take avg of $N$ error estimates), 1 chunk used for evaluating (compared against *true error* on full training set)
     - **Leave-one-out-Procedure**: Single test object
+
+In the experiment below, we show error rates and variance in error estimates for various values for `K` (no. of chunks in K-fold cross validation).
+
+- Overall, having a larger dataset (to be split into N chunks for training + separate test set) leads to *lower error rates*: both bias and variance are lower since there are less fluctuations.
+
+- As K increases, *error rates go down* since we average over more classifiers. Later this decrease steeps though. 
+    - For the same reason, the error estimates will also be *less biased*.
+
+- Generally, *variance in error estimates increase* as K becomes larger, as the N classifiers will be trained on very small chunks..
+    - Although there is an initial decrease in variance when we have more data (right)
+
+
+<p float="left">
+    <img src="3-Losses-Regularization-Evaluation/K-fold-cross-10NN-10.png" alt="drawing" width="400"/>
+    <img src="3-Losses-Regularization-Evaluation/K-fold-cross-10NN-50.png" alt="drawing" width="400"/>
+</p>
+
 - **Learning curves** show classification errors against the training set size
     - The discrepancy between *true error* and *apparent error* is **overfitting**
 - **Feature curves** show how the classification error varies with varying numbers of feature dimensionality
@@ -62,7 +79,6 @@ This is because the classifier becomes very complex.
     - The more complex the model, the more training samples needed! 
     - *Large, independent test sets* yield an unbiased and small variance error estimate (but worse classifier due to less data used for training..)
     - *Small, independent test sets* yield an unbiased and large variance error estimate
-
 
 
 ## 4a. Probabilistic Models 
