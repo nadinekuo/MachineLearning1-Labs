@@ -16,15 +16,17 @@ How does training size / feature dimensionality influence optimal `h` for Parzen
 
 In the 2D case, increasing the training set size does not necessarily lead to a higher or lower optimal value for `h`, but we can see the (asymptoptic) LL gets much higher (i.e. lower error)!
 
-<img src="1-Basics-of-ML/Parzen-LL-20-2d.png" alt="drawing" width="400"/>
-
-<img src="1-Basics-of-ML/Parzen-LL-1000-2d.png" alt="drawing" width="400"/>
+<p float="left">
+    <img src="1-Basics-of-ML/Parzen-LL-20-2d.png" alt="drawing" width="400"/>
+    <img src="1-Basics-of-ML/Parzen-LL-1000-2d.png" alt="drawing" width="400"/>
+</p>
 
 It becomes clear that increasing the no. of features leads to a higher optimal `h`:
 
-<img src="1-Basics-of-ML/Parzen-LL-20-30d.png" alt="drawing" width="400"/>
-
-<img src="1-Basics-of-ML/Parzen-LL-1000-30d.png" alt="drawing" width="400"/>
+<p float="left">
+    <img src="1-Basics-of-ML/Parzen-LL-20-30d.png" alt="drawing" width="400"/>
+    <img src="1-Basics-of-ML/Parzen-LL-1000-30d.png" alt="drawing" width="400"/>
+</p>
 
 Differently from the 2D case however, increasing training set size when we have 30 features does not seem to lead to a higher asymptotic LL... We do see a much higher LL on the train set - and overall a large disprepancy between train and test LL (overfitting).
 This is because the classifier becomes very complex.
