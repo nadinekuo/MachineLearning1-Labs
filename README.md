@@ -5,16 +5,42 @@
 
 ## 1. Basics of Machine Learning
 
+- **Parametric classifiers** assume a finite set of parameters that capture everything there is to know about the data i.e. $P(x | y)$ is approximated by $P(x | \theta)$
+    - Classifiers using parametric density estimations + Bayes: `QDA, LDA, NMC`
+    -  Quadratic Classifier `QDA` has a quadratic decision boundary, due to limited data. 
+        - In the limit, the solutions by `LDA` and `QDA` will coincide
+- **Non-parametric classifiers** assume an infinite set of possible (hyper)parameters that are to be tuned using K-cross validation e.g.
+    - Classifiers using non-parametric density estimations + Bayes: `Parzen`, `k-NN`
+    - Hyperparameters (such as $h$ in Parzen estimator) should be tuned on test sets independent from training data
+        - Optimal value can be found by plotting values (x-axis) against the log-likelihood (y-axis) using elbow method
+
 - **Optimal decision boundary** (where posteriors $P(y1|x) = P(y2|x)$) corresponds to **Bayes error** (i.e. minimal error)
--  **Quadratic Classifier (QDA)** has a quadratic decision boundary, due to limited data. 
-    - In the limit, the solutions by LDA and QDA will coincide
-- Hyperparameters (such as $h$ in Parzen estimator) should be tuned on test sets independent from training data
-    - Optimal value can be found by plotting values (x-axis) against the log-likelihood (y-axis) using elbow method
+
+
 - Parzen, k-NN and NMC are sensitive to **scaling** of features, because these methods do not estimate covariance matrices
 
-How does training size / feature dimensionality influence optimal `h` for Parzen?
+- How to find out if a feature is conditionally independent of another feature: you have to check for all possible combinations of $X1$ and $X2$ if it holds that:
+$P(X1, X2) = P(X1)P(X2)$
+That is not easy, because you have to check that for all possible combinations $(X1, X2)$!
 
-In the 2D case, increasing the training set size does not necessarily lead to a higher or lower optimal value for `h`, but we can see the (asymptoptic) LL gets much higher (i.e. lower error)!
+<span style="color:red"> When you have many features, beware of curse of dimensionality! </span>
+
+<span style="color:red"> Avoid density estimation (particularly in high dimensional feature space)! </span> From `k-NN` we saw this is not needed.
+
+Alternatives:
+- Have function `f` that describes decision boundary + optimize free parameters of `f` directly
+- No Bayes, no density estimates!
+
+
+### Goal: try to use all information, without overfitting.
+- Reduce features
+- Simplify models
+- Careful optimization
+
+### How does training size / feature dimensionality influence optimal `h` for Parzen?
+
+Generally, increasing training set size leads to a smaller optimal width parameter `h`.
+This is not very clear from the plots below, but we can see the (asymptoptic) LL gets much higher (i.e. lower error)!
 
 <p float="left">
     <img src="1-Basics-of-ML/Parzen-LL-20-2d.png" alt="drawing" width="400"/>
@@ -30,6 +56,26 @@ It becomes clear that increasing the no. of features leads to a higher optimal `
 
 Differently from the 2D case however, increasing training set size when we have 30 features does not seem to lead to a higher asymptotic LL... We do see a much higher LL on the train set - and overall a large disprepancy between train and test LL (overfitting).
 This is because the classifier becomes very complex.
+
+### How does training size / feature dimensionality influence optimal `k` for K-NN?
+
+Generally, increasing training set size leads to higher optimal `k`. Intuition: more points to consider.
+
+By adding more features, the distances between objects starts to grow, but the
+difference between the closest and furthest point starts to get smaller. 
+So if you now want to do a K-NN classifier, you typically need a smaller `k`. 
+(this is not clear from the experiment results below though)
+
+<p float="left">
+    <img src="1-Basics-of-ML/Knn-MSE-50-3d.png" alt="drawing" width="400"/>
+    <img src="1-Basics-of-ML/Knn-MSE-50-50d.png" alt="drawing" width="400"/>
+</p>
+
+<p float="left">
+    <img src="1-Basics-of-ML/Knn-MSE-1000-3d.png" alt="drawing" width="400"/>
+    <img src="1-Basics-of-ML/Knn-MSE-1000-50d.png" alt="drawing" width="400"/>
+</p>
+
 
 ## 2. Linear Regression & Linear Classifiers
 
