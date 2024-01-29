@@ -9,6 +9,7 @@
     - Classifiers using parametric density estimations + Bayes: `QDA, LDA, NMC`
     -  Quadratic Classifier `QDA` has a quadratic decision boundary, due to limited data. 
         - In the limit, the solutions by `LDA` and `QDA` will coincide
+        - With very large regularization ($\lambda \rightarrow \inf$) and equal class priors: `QDA` becomes `LDA`
 - **Non-parametric classifiers** assume an infinite set of possible (hyper)parameters that are to be tuned using K-cross validation e.g.
     - Classifiers using non-parametric density estimations + Bayes: `Parzen`, `k-NN`
     - Hyperparameters (such as $h$ in Parzen estimator) should be tuned on test sets independent from training data
@@ -17,15 +18,24 @@
 - **Optimal decision boundary** (where posteriors $P(y1|x) = P(y2|x)$) corresponds to **Bayes error** (i.e. minimal error)
 
 
-- Parzen, k-NN and NMC are sensitive to **scaling** of features, because these methods do not estimate covariance matrices
+- `Parzen`, `k-NN` and `NMC` are sensitive to **scaling** of features (if you have more than 1 feature), because these methods do not estimate covariance matrices
 
 - How to find out if a feature is conditionally independent of another feature: you have to check for all possible combinations of $X1$ and $X2$ if it holds that:
 $P(X1, X2) = P(X1)P(X2)$
 That is not easy, because you have to check that for all possible combinations $(X1, X2)$!
 
+- Inverse of $\sum$ (for centered data: $X^TX$) may not exist if:
+    - Not sufficient data ($|S_T| <= dimensionality$) i.e. variance of features is 0
+        - Use regularization (i.e. add some $\lambda$ to $\sigma$) / dimensionality reduction! 
+    - When $|S_T| = dimensionality$, $\sum$ is singular
+    - X is not full column rank (features not linearly independent)
+
 <span style="color:red"> When you have many features, beware of curse of dimensionality! </span>
 
 <span style="color:red"> Avoid density estimation (particularly in high dimensional feature space)! </span> From `k-NN` we saw this is not needed.
+
+
+
 
 Alternatives:
 - Have function `f` that describes decision boundary + optimize free parameters of `f` directly
@@ -79,16 +89,68 @@ So if you now want to do a K-NN classifier, you typically need a smaller `k`.
 
 ## 2. Linear Regression & Linear Classifiers
 
-- Differently from labelled datasets (often numeric labels $y$) in supervised classification tasks, **regression datasets** contain inputs $x$ (uniformly distributed e.g.) with a corresponding $y$ depdendent on $x$ ($y = x^2 + \epsilon$ where $\epsilon$ can be some Gaussian noise e.g.)
+> Classification: discrete labels
+
+> Regression: continuous output values
+
+- Differently from labelled datasets (often numeric labels $y$) in supervised classification tasks, **regression datasets** contain continuous inputs $x$ (uniformly distributed e.g.) with a corresponding $y$ depdendent on $x$ ($y = x^2 + \epsilon$ where $\epsilon$ can be some Gaussian noise e.g.)
 - We can fit linear functions under the **squared loss** using $w = (X^TX)^-1 * X^T * Y$
+    - Note that this metric is *absolute*! So it will be biased towards points with distances larger in absolute magnitude.
     - Typically we have an intercept as well giving $w^T = [w_0, w_1]$ which can be plugged into $f(x) = w_1 * x + w_0$ 
     - Note we need to add a bias term to X
+
+- If data is non-linear, we can apply **feature transformations** (maps data to higher dimension) to allow for separability
+
+### Ordinary Least Squares
+
+Goal: minimize squared residuals $\sum_{i=1}^{N}{(y_i - x_i^Tw)}^2$
+
+- Has similarities with Normal error model
+- Statistical validation methods: Tukey-Anscombe Plot, Normal (Q-Q) Plot
+
+| Pros | Cons |
+| -------- | -------- |
+| Simple, efficient | Assumes linear relationship |
+| Best unbiased method | $(X^TX)^-1$ non-existent if features co-linear |
+| Suitable for confidence intervals and hypothesis testing | Sensitive to outliers |
+| | "Bestness" is under homoscedasticity assumption | 
+
+Below two probabilistic methods (typically Gaussian curve fitting assumed):
+
+### Maximum Likelihood
+
+Goal: maximize likelihood of data $P(y | x, \theta)$
+
+- Probabilistic
+- Point estimate $w_{ML} = w_{OLS}$ but they are different!
+
+<!-- | Pros | Cons |
+| -------- | -------- |
+| | |
+| | |
+| | | -->
+
+### Maximum a Posteriori (MAP)
+
+Goal: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model.
+
+- Probabilistic 
+- Bayesian
+
+| Pros | Cons |
+| -------- | -------- |
+| Can act like regularization | Slightly increases bias (but outweighted by decrease in variance) |
+|  | Imposes cost on model params |
+| | |
+
 - **Polynomial Regression** fits a polynomial of some *maximal* degree to the data in a least squares sense
     - *Note: even though this results in a non-linear function in x, the regression function is linear in the unknown parameters w estimated from the data.*
     - If there are 4 data points, one needs at least a third-order polynomial to fit these (whether there is a bias term does not matter)
     - Note that linear regressors (`linearr`) do not take into cross-terms, leading to high error rates when trained on (non-linear data) that contain multiplications of $x_i$ terms: e.g. data modelled as $y = sin(x1)sin(x2)$
 - **Decision boundary** of **linear classifier** is found at $f(x) = y = 0$
     - $y = ax + b$ with intercept $b = -w_0 / w_2$ and slope $a = -(w_0/w_2)/(w_0/w_1)$
+
+
 
 
 ## 3. Losses, Regularization, Evaluation
@@ -143,7 +205,9 @@ In the experiment below, we show error rates and variance in error estimates for
     - The *Haldane prior* is an improper prior that does not satisfy all properties of a pdf
         - Leads to uniform posterior $P(w | x, y)$, so no unique MAP solution
     - $w_{MAP}$ may coincide with the solutions for Ridge (R2) and Lasso (L1) regularization, depending on assumptions made on the prior
+- **Predictive Distribution** is based on MAP but rather than a point estimate, it models a *distribution* that is updated using observed data
 
+- **Bayesian Inference**: treat parameters of model $P(\theta | D)$ as RVs and update their distributions when observing data.
 - **Bayesian networks** allow us to reason about dependencies between random variables and thus construct $P$ from simpler components 
     - Given $N$ RVs, there are $N!$ possible decompositions
     - Even if not all assumptions are valid, model complexity is still lowered due to fewer parameters to estimate 
@@ -172,23 +236,30 @@ In the experiment below, we show error rates and variance in error estimates for
 
 #### K-means
 
+- Not deterministic: Many random initializations of clusters have to be tried, particularly for highly dimensional data, to avoid getting stuck in local minima
+
 | Pros | Cons |
 | -------- | -------- |
 | Simple, fast     | <span style="color:red"> Assumes spherical/convex clusters </span> | 
 | | <span style="color:red"> Sensitive to initialization <span> | 
+| | <span style="color:red"> Susceptible to scaling of features <span> | 
 |  | Can get stuck in local minima (*start from many random initializations*) |
 | | Clusters can lose all samples (*remove cluster or split largest into 2*) | 
 
 
 #### Mixture of Gaussians (soft / probabilistic)
 
+- Not deterministic: EM is repeated with different initializations to find $\theta$ with highest likelihood
+
+- When diagonal entries of $\sum$ (i.e. $\sigma$) become VERY small, we essentially have K-means!
+
 | Pros | Cons |
 | -------- | -------- |
 | Can use prior knowledge on cluster distribution | <span style="color:red"> Assumes a priori known no. of clusters </span> |
 | Gives general framework for any density mixture | Need to define a cluster density (e.g. Gaussian) |
 | Allows for overlapping clusters | Guarantees finding of *local* optimum only |
-| | May converge slowly |
-| | <span style="color:red"> Is dependent on initialization <span> | 
+| Accounts for difference in scale through $\sum_j$ | May converge slowly |
+| Allows for various cluster shapes | <span style="color:red"> Is dependent on initialization: random memberships <span> | 
 
 
 
@@ -205,6 +276,8 @@ In the experiment below, we show error rates and variance in error estimates for
 
 
 ### Hierarchical Techniques
+
+- Pick the best linkage type based on shape of data!
 
 | Pros | Cons |
 | -------- | -------- |
@@ -229,6 +302,10 @@ In the experiment below, we show error rates and variance in error estimates for
 
 
 ## 5. Complexity
+
+- Complexity = ability to fit to any distribution of data
+    - != #features != #params 
+    - Choose complexity according to available data (training set size, dim, class overlap, class shape...)!
 
 - The **Support Vector Machine (SVM)** is a linear classifier that aims to minimize the VC-dimension (complexity metric) by constrained optimization
     - $g(x) = w^Tx + w_0 = \sum^{N}_{i=1}{\alpha_iy_ix_i} + w_o$ 
@@ -299,10 +376,18 @@ $J_F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$
 
 ## 6b. Combining Classifiers
 
+- Why combining? 
+    - Even if one classifier performs better than another, former may still be better in particular part of feature space
+    - Stabilizing variable classifiers
+
+- Decision trees: first form of combining classifiers (greedily) by having various thresholds (essentially linear classifier) that together lead to the final predicted class $y_i$    
+    - Variance can be reduced by combining and averaging -> **bagging** models this variability by resampling, building new trees and averaging them
+
+
+
 ### Fixed Combining Rules
 
-- Special trained rules based on "classifier confidences"
-- General trained rules interpreting base-classifier outputs as features
+<!-- - Special trained rules based on "classifier confidences" -->
 
 Base classifier: $y = S(x | \theta_{base})$
 
@@ -313,13 +398,15 @@ Different combining rules possible:
 - Sum (mean), median, majority vote
 - Maximum
 
-<span style="color:red"> Supoptimal: neglect the classification confidence characteristic of the base classifier outputs, as they are treated as general feature values... </span>
+<span style="color:red"> Supoptimal: neglect the classification confidence characteristic of the base classifier outputs, as they are treated as general feature values... Larger training sets do not improve this.... </span>
 
 
 
 ### Trained Combining Rules
 
-Output: posterior probability distribution over all $C$ classes, rather than a single class decided by a fixed combining rule.
+- General trained rules interpreting base-classifier outputs as features
+
+- Output: posterior probability distribution over all $C$ classes, rather than a single class decided by a fixed combining rule.
 
 Special trained combiners:
 - DT: Decision Templates ~ Nearest Mean
@@ -331,9 +418,172 @@ Special trained combiners:
 
 #### Generation of Base Classifiers
 
-- **Random Subspace** Approach
-- **Bagging** ~ bootstrapping & aggregate
-- **Boosting ~ AdaBoost**
-    - Assumes decision stump as weak base classifier
-    - Minimizes exponential error
-    - <span style="color:red"> Suffers from overtraining when combining ~ >= 1000 classifiers... </span> - large discrepancy between true error and apparent error (never converge)
+Base classifiers are trained on systematically different training sets!
+
+| Pros | Cons |
+| -------- | -------- |
+| Simple, not overtrained (especially not for trained combiners) |  Weak: should be combined! |
+| Many: fast training / execution | Large bias, large variance - soft outputs may be helpful |
+
+
+- **Random Subspace** ~ different feature samplings
+    - Select random $N$ subsets of $k' < k$ features 
+    - Train $N$ classifiers and combine
+
+- **Bagging (Bootstrap & Aggregate)** ~ different object samplings 
+    - Select random $N$ subsets of $m' < m$ training samples
+    - Train 1 classifier (original: decision tree)
+    - Combine (original: vote)
+
+**Random forests** combine bagging and random subspace approach.
+
+- **Boosting**
+    - Greedily constructs 2-class classifier
+    - Sample training set of size $m' < m$ according to a set of object weights (initially equal)
+    - Train a weak classifier
+    - Increase weights of erroneously classified objects
+    - Repeat and combine eventually
+
+
+ **AdaBoost**: adaptive way of boosting by lowering weights for points for which we obtain good performance already, so we adjust to complex points/feature spaces and update base classifier accordingly
+- Assumes decision stump as weak base classifier
+- Minimizes exponential error
+- <span style="color:red"> Suffers from overtraining when combining ~ >= 1000 classifiers... - large discrepancy between true error and apparent error (never converge) </span> 
+
+
+
+
+### Neural Networks
+
+- **Perceptron** = 2-class linear disciminant
+    - When classes are not linearly separable, indefinite training - weights will blow up! 
+    - Use non-linear activation functions!
+- **Neural Network** = multi-layered perceptrons with non-linear activation functions (e.g. sigmoidal, step)
+    - Incremental update of weights through backpropagation ( = clever gradient descent i.e. updates can be parallellized)
+    - X hidden layers
+    - Linear output units
+    - Low $w \leftrightarrow$ low complexity so by stopping in time we automatically regularize! 
+    - #params = $\sum_{l = 1}^{o -1}{(n_l + 1) * n_{l+1}}$ so summing up units per layer
+        - e.g. when $p = 10$ (dim), $C = 2$ (binary classification) and we have two $20$-unit hidden layers: $(10 + 1) * 20 + (20 + 1) * 20 + (20 + 1) * 2 = 682$
+
+| Pros | Cons |
+| -------- | -------- |
+| Complex enough NNs can separate any training set | Can get stuck in local optima |
+| More flexible than AdaBoost / decision trees | Choice of network topology |
+| | Danger of overtraining! Use small networks / regularize weights. |
+| | Not very explainable |
+
+
+## Overview Classifiers
+
+<!-- - Output function
+- Bayes?
+- Distribution?
+- Optimization criteria / params
+- Expensive?
+- Free params? -->
+
+
+### Classification - discrete labels
+
+##### Parametric
+
+`Naive Bayes`
+- Assigns test object to class with highest posterior:
+    - $P(y | x) = \frac{P(x|y)P(y)}{P(x)}$
+- Assume independent features, given a class! The `Bayes Classifier` does not make this assumption.
+    - Given a dataset, the `Bayes` classifier has the lowest classification error! 
+- The classification error found for an infinite training set is for the `Bayes` classifier a non-increasing function of the no. of features
+
+`Discriminant Analysis: QDA, LDA, NMC`
+- Model each class as a Gaussian distribution
+- Optimization criteria: use (log-)likelihood to tune $\sum$, $\mu$, class priors $P(y)$
+- In case of regularization, set free param $\lambda$
+- `QDA`
+    - Classification of new point $z$: $\hat{y} = sign((z - \mu_B)^T \sum_B (z - \mu_B) - (z - \mu_A)^T \sum_A (z - \mu_A))$
+    - Coincides with `LDA` in the limit
+    - Equivalent to `Gaussian Naive Bayes` if $\sum$ is diagonal and the input features are conditionally independent in each class 
+    - Cost of training: expensive for high-dimensional data, as we need to invert $\sum$...
+    - Cost of evaluating new test object: matrix multiplication $\sum * X$ so can be parallelized
+- `LDA`
+    - Classification of new point $z$: $\hat{y} = ... $
+- `NMC`
+    - Classification of new point $z$: $\hat{y} = ... $ 
+
+
+##### Non-parametric: $P(x|y) = P(x | \theta)$
+
+`Parzen`
+- ...
+- ...
+- ...
+
+`k-NN`
+- ...
+- ...
+- ...
+
+`Support Vector Machine`
+
+- Classification of new point $z$: $\hat{y} = sign(w^T * z + w_0)$ 
+
+- Non-linear SVM using a kernel: $\hat{y} = sign(\sum_{i}{\alpha_i y_i K(z, x_i)})$
+
+- Optimization criteria: maximize margin to tune Lagrange multiplier $\lambda_i$ for each object
+
+- Introduction of slack variables comes with cost $C$ - a free param to set by user
+
+- Cost of training: expensive in no. of training objects, as we need to solve quadratic program...
+- Cost of evaluating new test object: inner product is OK, but in case of nonlinear SVC, computation of kernel may become expensive!
+
+`Fisher`
+- ...
+- ...
+- ...
+
+`Perceptron`
+- Is able to solve the XOR problem
+- ...
+- ...
+
+
+#### Regression - continuous labels
+
+`Linear Regression`
+- ...
+- ...
+- ...
+
+`Logistic Regression`
+
+Models the log of the ratio of the class probabilities as a linear function:
+
+Maximizes $\sum_{x \in y_1}{log(\frac{1}{1 + e^{-f(x)}})} + \sum_{x \in y_2}{log(\frac{1}{1 + e^{f(x)}})}$
+
+Classification of new point $z$: $\hat{y} = sign(w^T * z + w_0)$
+
+- Optimization criteria: use (log-)likelihood to tune $f(x)$
+- In case of regularization, set free param $\lambda$
+
+- Cost of training: gradient ascent is expensive when we have many features!
+- Cost of evaluating new test object: inner product is OK
+
+
+#### Combiners
+
+`MLPs` / `Neural Networks`
+- Backpropagration: Gradient descent
+- ...
+- ...
+
+`Decision Trees` / `Decision Stumps`
+- ...
+- ...
+- ...
+
+`Random Forests`
+- Created by bagging decision trees combined with random subspace approach 
+- ...
+- ...
+
+
