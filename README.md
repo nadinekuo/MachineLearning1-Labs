@@ -106,7 +106,7 @@ So if you now want to do a K-NN classifier, you typically need a smaller `k`.
 
 ### Ordinary Least Squares
 
-Goal: minimize squared residuals $\sum_{i=1}^{N}{(y_i - x_i^Tw)}^2$
+Goal: minimize squared residuals $\sum_{i=1}^{N}{(y_i - x_i^Tw)}^2$ giving $\hat{w}_{OLS} = (X^TX)^-1X^TY$
 
 - Has similarities with Normal error model
 - Statistical validation methods: Tukey-Anscombe Plot, Normal (Q-Q) Plot
@@ -136,10 +136,10 @@ Goal: maximize likelihood of data $P(y | x, \theta)$
 
 ### Maximum a Posteriori (MAP)
 
-Goal: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model - combined with actual data (MLE).
+Goal: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model - combined with actual data (MLE). Gives $\hat{w_{MAP}} = (X^TX + \frac{\sigma^2}{\sigma_\theta^2}I)^{-1}X^TY$
 
 - Probabilistic 
-- Bayesian
+- Bayesian + Gaussian assumption: $\hat{w_{MAP}} = max_w (N(y_i | w^Tx_i, \sigma^2) \cdot N(w | 0, \sigma_\theta^2))$
 
 | Pros | Cons |
 | -------- | -------- |
@@ -225,11 +225,7 @@ In the experiment below, we show error rates and variance in error estimates for
     - Output: dendogram
     - Algorithm stops when there is 1 cluster left, after which we cut the dendogram to obtain the desired no. of clusters (long vertical bars imply large distances)
     - *Single linkage is sensitive to outliers!*
-- **Mixture of Gaussians**
-    -  We assume K separate distributions, one for each cluster
-    - The  **EM-algorithm** is used to approximate model parameters
-        - E-step: Update membership $P(C_k|x; \theta)$ based on updated classifier
-        - M-step: Improve model by updating maximum likelihood estimates ($L(\theta | x) = \prod^N_{i=1}p(x_i|\theta)$) of parameters based on cluster membership
+
 - **Cluster validation** is used for assessing clusterings and no. of clusters
     - **Fusion level maps** plot the linkage distances (y-axis) against the number of clusters (x-axis)
         - Heuristic: cut the dendogram at largest jump
@@ -241,6 +237,12 @@ In the experiment below, we show error rates and variance in error estimates for
 #### K-means
 
 - Not deterministic: Many random initializations of clusters have to be tried, particularly for highly dimensional data, to avoid getting stuck in local minima
+- Tries to minimize trace of within-scatter for every cluster: $Tr\{S_w\} = \frac{1}{n} \sum_j{S_j}$
+    - Within-scatter of one cluster: $S_j = \sum_{i = 1}^{n_j}{|x_i - \mu_j|^2} \leftrightarrow $ sum of diagonal entries in $\Sigma_j$
+    - Total within scatter: $S_w = \sum_{i=1}^m \frac{n_i}{n} \Sigma_i$
+    - Between scatter: $S_B = \sum_{i=1 00}^{m} \frac{n_i}{n}(\mu_i - m)(\mu_i - m)^T$
+- When $k \rightarrow n$: $Tr\{S_j\} = 0$
+- When $k \rightarrow 1$: $Tr\{S_j\} = var(X)$
 
 | Pros | Cons |
 | -------- | -------- |
@@ -256,6 +258,11 @@ In the experiment below, we show error rates and variance in error estimates for
 - Not deterministic: EM is repeated with different initializations to find $\theta$ with highest likelihood
 
 - When diagonal entries of $\sum$ (i.e. $\sigma$) become VERY small, we essentially have K-means!
+
+-  We assume K separate distributions, one for each cluster
+- The  **EM-algorithm** is used to approximate model parameters
+    - E-step: Update membership $P(C_k|x; \theta)$ based on updated classifier
+    - M-step: Improve model by updating maximum likelihood estimates ($L(\theta | x) = \prod^N_{i=1}p(x_i|\theta)$) of parameters based on cluster membership
 
 | Pros | Cons |
 | -------- | -------- |
@@ -334,43 +341,35 @@ In the experiment below, we show error rates and variance in error estimates for
 
 - Does not directly reduce dimensions, but projects data to new space i.e. moves x-axis into principle axis of largest variation (`PC 1`) by translation and rotation
 
-- Global and linear
+- Global and linear: minimizes squared reconstruction error 
 
-- Can only be applied to data that is linearly separable
-    - If that is not the case, a kernel function $\Phi$ can be used to map original data to higher dimension in which it's linearly separable 
-
+- <span style="color:red"> Not scaling invariant! </span>
+- <span style="color:red"> Can only be applied to data that is linearly separable </span> - else use kernel function $\Phi$ 
+- <span style="color:red"> May need considerable amount of data to estimate cov matrix well </span>
+- <span style="color:red"> Criterion not necessarily related to goal - may discard useful data </span>
 
 **Linear Discriminant Analysis (Fisher Mapping)** - Supervised
 
 - Similarity with PCA: projects data onto new axes to reduce dimensionality
 - Difference: maximizes *separability of classes* rather than *global variance*
-
+- Choose $\alpha$ to maximize Fisher criterion: $J_F(a) = \frac{\alpha^T S_B \alpha}{\alpha^T S_W \alpha} \leftrightarrow \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$ in 1D
 
 
 ### Feature Selection
 
-Greedy approximations (alternative to exhaustive search algorithms):
+Exhaustive search gives ${d}\choose{k}$ = $\frac{d!}{k!(d-k)!}$ possible subsets... 
 
-- **Simplest Variation**: select best individual $d$
+Total combinations for any $k$: $\sum_{i=1}^d$ ${d}\choose{i}$
 
-- **Forward Selection**: start with empty feature set. One at a time, keep adding feature that gives best performance when added to current selection.
-
-- **Backward Selection**: start with all features. One at a time, remove feature that leads to best performance considering the feature selection remaining.
-
-- **Plus-l-take-away-r**: start with empty set (if $l > r$) or entire set (if $l < r$). Keep adding best $l$ and removing worst $r$ or vice versa.
+Greedy approximations: **Simplest Variation**, **Forward Selection**, **Backward Selection**, **Plus-l-take-away-r**
 
 Criteria to use in approximations above:
 
-- **Heuristic Scatter Based**
+- **Heuristic Scatter Based** e.g. $J_1 = trace(S_w + S_B) = trace(\sum)$
 
-$J_1 = trace(S_w + S_B) = trace(\sum)$
-
-$J_2 = ...$ 
-
-- **Mahalanobis Distance**: distance measure between point and *distribution* - unlike Euclidean, accounts for variability in features!
+- **Mahalanobis Distance**: distance measure between point and *distribution* - unlike Euclidean, accounts for variability in features! Assumes Gaussian distributions with equal $\Sigma = C$
 
 $D_M = (\mu_1 - \mu_2)^TC^-1(\mu_1 - \mu_2)$
-
 
 - **Fisher Criterion**: seeks to minimize within-scatter and maximize between-scatter
 
