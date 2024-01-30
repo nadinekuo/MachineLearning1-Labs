@@ -99,7 +99,10 @@ So if you now want to do a K-NN classifier, you typically need a smaller `k`.
     - Typically we have an intercept as well giving $w^T = [w_0, w_1]$ which can be plugged into $f(x) = w_1 * x + w_0$ 
     - Note we need to add a bias term to X
 
-- If data is non-linear, we can apply **feature transformations** (maps data to higher dimension) to allow for separability
+- If data is non-linear, we can apply **feature transformations** (maps data to higher dimension by extending inputs to make them multivariate) to allow for separability
+    - e.g. when we apply a 3rd order polynomial: a point $(x_1, y_1)$ may become $((x_1, x_1^2, x_1^3), y_1)$
+    - NOTE: applying a linear classifier on transformed data essentially means applying a *non-linear* classifier to the original data!
+
 
 ### Ordinary Least Squares
 
@@ -122,6 +125,7 @@ Below two probabilistic methods (typically Gaussian curve fitting assumed):
 Goal: maximize likelihood of data $P(y | x, \theta)$
 
 - Probabilistic
+- Assumes Gaussian $P(y|x)$ ~ $N(y_i | w^Tx_i, \sigma^2)$
 - Point estimate $w_{ML} = w_{OLS}$ but they are different!
 
 <!-- | Pros | Cons |
@@ -132,7 +136,7 @@ Goal: maximize likelihood of data $P(y | x, \theta)$
 
 ### Maximum a Posteriori (MAP)
 
-Goal: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model.
+Goal: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model - combined with actual data (MLE).
 
 - Probabilistic 
 - Bayesian
@@ -476,13 +480,6 @@ Base classifiers are trained on systematically different training sets!
 
 ## Overview Classifiers
 
-<!-- - Output function
-- Bayes?
-- Distribution?
-- Optimization criteria / params
-- Expensive?
-- Free params? -->
-
 
 ### Classification - discrete labels
 
@@ -506,22 +503,22 @@ Base classifiers are trained on systematically different training sets!
     - Cost of training: expensive for high-dimensional data, as we need to invert $\sum$...
     - Cost of evaluating new test object: matrix multiplication $\sum * X$ so can be parallelized
 - `LDA`
-    - Classification of new point $z$: $\hat{y} = ... $
+    - Classification of new point $z$: $\hat{y} = sign((\mu_1 - \mu_2)^T \hat{\Sigma^{-1}}x + C) $  
 - `NMC`
-    - Classification of new point $z$: $\hat{y} = ... $ 
+    - Classification of new point $z$: $\hat{y} = (\hat{\mu_1} - \hat{\mu_2})x + C $ 
 
 
 ##### Non-parametric: $P(x|y) = P(x | \theta)$
 
 `Parzen`
-- ...
-- ...
-- ...
+- Fixed cell volumes located on every training point
+- Define Kernel - can be any distribution but Parzen uses Gaussian
+- Estimate $\hat{P}(z | h) = \frac{1}{N} \sum_{i=1}^{N}{K(||z - x_i||, h)} = \hat{P}(x|y_i) = \frac{1}{n_i} \sum_{j=1}^{n_i}{N(x | x_j^{(i)}, hI)}$
 
 `k-NN`
-- ...
-- ...
-- ...
+- Cell volumes can grow
+- Count how many objects of each of the classes are member of the $k$ neighbours: $\hat{P}(x|y_i) = \frac{k_i}{n_i * V_k}$
+- Class priors estimation: $P(y_i) = \frac{n_i}{n}$
 
 `Support Vector Machine`
 
@@ -536,23 +533,10 @@ Base classifiers are trained on systematically different training sets!
 - Cost of training: expensive in no. of training objects, as we need to solve quadratic program...
 - Cost of evaluating new test object: inner product is OK, but in case of nonlinear SVC, computation of kernel may become expensive!
 
-`Fisher`
-- ...
-- ...
-- ...
 
-`Perceptron`
-- Is able to solve the XOR problem
-- ...
-- ...
-
-
-#### Regression - continuous labels
-
-`Linear Regression`
-- ...
-- ...
-- ...
+`Linear Regression (OLS)`
+- Outputs continuous $y$ given some $x$
+- Minimizes Least Squares Error: $J(w) = E[|y - w^Tx|^2]$
 
 `Logistic Regression`
 
@@ -568,22 +552,11 @@ Classification of new point $z$: $\hat{y} = sign(w^T * z + w_0)$
 - Cost of training: gradient ascent is expensive when we have many features!
 - Cost of evaluating new test object: inner product is OK
 
+`Fisher (LS regression classifier)`
+- Find fit $f(x)$ that minimizes LS error
+- Set decision boundary at $f(x) = 0$
 
-#### Combiners
-
-`MLPs` / `Neural Networks`
-- Backpropagration: Gradient descent
-- ...
-- ...
-
-`Decision Trees` / `Decision Stumps`
-- ...
-- ...
-- ...
-
-`Random Forests`
-- Created by bagging decision trees combined with random subspace approach 
-- ...
-- ...
-
+`Perceptron`
+- Is able to solve the XOR problem
+- Optimization criteria: minimize no. of misclassified objects $J(w) = \sum_{misclassified x_i}{-y_iw^Tx_i}$
 
