@@ -106,10 +106,11 @@ So if you now want to do a K-NN classifier, you typically need a smaller `k`.
 
 ### Ordinary Least Squares
 
-Goal: minimize squared residuals $\sum_{i=1}^{N}{(y_i - x_i^Tw)}^2$ giving $\hat{w}_{OLS} = (X^TX)^-1X^TY$
+Goal: minimize squared residuals $\sum_{i=1}^{N}{(y_i - x_i^Tw)}^2$ giving $\hat{w}_{OLS} = (X^TX)^{-1}X^TY$
 
 - Has similarities with Normal error model
 - Statistical validation methods: Tukey-Anscombe Plot, Normal (Q-Q) Plot
+- $\hat{\theta^{OLS}_{Ridge}} = argmin_{\theta} \sum_{i=1}^{N}{(y_i - x_i^T\theta)^2 + \lambda\theta^T\theta} = (\lambda I + X^TX)^{-1}X^TY$ but Lasso has no closed form!
 
 | Pros | Cons |
 | -------- | -------- |
@@ -120,26 +121,19 @@ Goal: minimize squared residuals $\sum_{i=1}^{N}{(y_i - x_i^Tw)}^2$ giving $\hat
 
 Below two probabilistic methods (typically Gaussian curve fitting assumed):
 
-### Maximum Likelihood
+### Maximum Likelihood (MLE)
 
-Goal: maximize likelihood of data $P(y | x, \theta)$
-
-- Probabilistic
-- Assumes Gaussian $P(y|x)$ ~ $N(y_i | w^Tx_i, \sigma^2)$
+Probabilistic: maximize likelihood of data $P(y | x, \theta)$ ~ $N(y_i | w^Tx_i, \sigma^2)$
 - Point estimate $w_{ML} = w_{OLS}$ but they are different!
-
-<!-- | Pros | Cons |
-| -------- | -------- |
-| | |
-| | |
-| | | -->
+- $\hat{w}_{ML} = argmin_{\theta \in R^{d+1}}(Y-X\theta)(Y-X\theta)^T = (X^TX)^{-1}X^TY$ 
+- $\hat{\sigma^2} = \frac{1}{N}\sum_{i=1}^{N}{(r_i)^2}$
 
 ### Maximum a Posteriori (MAP)
 
-Goal: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model - combined with actual data (MLE). Gives $\hat{w_{MAP}} = (X^TX + \frac{\sigma^2}{\sigma_\theta^2}I)^{-1}X^TY$
+Probabilistic: maximize posterior (objective) $P(\theta | x, y) = P(y | \theta, x) * P(\theta)$ by incorporating prior knowledge on weights for which we assume Gaussian model - combined with actual data (MLE). Gives $\hat{w_{MAP}} = (X^TX + \frac{\sigma^2}{\sigma_\theta^2}I)^{-1}X^TY$
 
-- Probabilistic 
-- Bayesian + Gaussian assumption: $\hat{w_{MAP}} = max_w (N(y_i | w^Tx_i, \sigma^2) \cdot N(w | 0, \sigma_\theta^2))$
+- Assume we know $\sigma^2$ in MLE
+- Bayesian + Gaussian assumption: $\hat{w_{MAP}} = argmax_w (N(y_i | w^Tx_i, \sigma^2) \cdot N(w | 0, \sigma_\theta^2))$
 
 | Pros | Cons |
 | -------- | -------- |
@@ -255,14 +249,15 @@ In the experiment below, we show error rates and variance in error estimates for
 
 #### Mixture of Gaussians (soft / probabilistic)
 
-- Not deterministic: EM is repeated with different initializations to find $\theta$ with highest likelihood
+- Not deterministic: EM is repeated with different initializations to find $\theta$ with highest likelihood with probabilistic mixture model $P(x|\theta) = \sum_{j=1}^{m}{u_j P(x|\theta_j)}$ and params $u_j, \mu_j, \Sigma_j$
+    - Mixing proportions: $u_j \geq 0, \sum_{j=1}^m u_j = 1$ 
 
-- When diagonal entries of $\sum$ (i.e. $\sigma$) become VERY small, we essentially have K-means!
+- When diagonal entries of $\sum$ (i.e. $\sigma$) become VERY small, we essentially have K-means (spherical, samples always assigned to closest cluster)!
 
 -  We assume K separate distributions, one for each cluster
 - The  **EM-algorithm** is used to approximate model parameters
-    - E-step: Update membership $P(C_k|x; \theta)$ based on updated classifier
-    - M-step: Improve model by updating maximum likelihood estimates ($L(\theta | x) = \prod^N_{i=1}p(x_i|\theta)$) of parameters based on cluster membership
+    - E-step: Update membership $P(C_k|x; \theta)$ based on updated classifier (initially random)
+    - M-step: Improve model by updating maximum likelihood estimates ($L(\theta | X) = \prod^N_{i=1}p(x_i|\theta)$) of parameters based on cluster membership
 
 | Pros | Cons |
 | -------- | -------- |
